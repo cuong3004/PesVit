@@ -3,6 +3,8 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.callbacks import LearningRateMonitor
 from ghostpes.dataset import dataloader_train_moco
 from ghostpes.config import *
+from ghostpes.moco import MocoModel
+import pytorch_lightning as pl
 import torch
 
 lr_monitor = LearningRateMonitor(logging_interval='step')
