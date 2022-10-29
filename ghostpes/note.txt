@@ -138,6 +138,24 @@ cfgs = [
 
 ## ghost_vit_4
 
+model_ghost_git.layer_2 = nn.Conv2d(40, 48, 1)
+model_ghost_git.layer_3[0] = Identity()
+model_ghost_git.layer_3[1] = Identity()
+model_ghost_git.layer_4[0] = module_ghost_1
+model_ghost_git.layer_4[1] = module_ghost_4_1
+model_ghost_git.layer_5[0] = module_ghost_2
+model_ghost_git.layer_5[1] = module_ghost_5_1
+//
+
+module_ghost_1  = GhostBottleneck(48, hidden_channel_1, output_channel_1, se_ratio=0.25)
+module_ghost_2  = GhostBottleneck(64, hidden_channel_2, output_channel_2, se_ratio=0.25)
+
+# module_ghost_2  = GhostBottleneck(64, hidden_channel_2, output_channel_2, se_ratio=0.25)
+module_ghost_4_1  = GhostBottleneck(output_channel_1, hidden_channel_1, output_channel_1, se_ratio=0.25)
+module_ghost_5_1  = GhostBottleneck(output_channel_2, hidden_channel_2, output_channel_2, se_ratio=0.25)
+
+//
+
 cfgs = [
     # k, t, c, SE, s 
     # stage1
@@ -167,6 +185,13 @@ cfgs = [
 
 ## ghost_vit_5
 
+module_ghost_1  = GhostBottleneck(48, hidden_channel_1, output_channel_1, se_ratio=0.25, stride=2)
+module_ghost_2  = GhostBottleneck(64, hidden_channel_2, output_channel_2, se_ratio=0.25, stride=2)
+
+# module_ghost_2  = GhostBottleneck(64, hidden_channel_2, output_channel_2, se_ratio=0.25)
+module_ghost_4_1  = GhostBottleneck(output_channel_1, hidden_channel_1, output_channel_1, se_ratio=0.25)
+module_ghost_5_1  = GhostBottleneck(output_channel_2, hidden_channel_2, output_channel_2, se_ratio=0.25)
+
 cfgs = [
         # k, t, c, SE, s 
         # stage1
@@ -194,4 +219,11 @@ cfgs = [
         ]
     ]
 
-
+## ghost_vit_6
+model_ghost_git.layer_2 = nn.Conv2d(40, 48, 1)
+model_ghost_git.layer_3[0] = Identity()
+model_ghost_git.layer_3[1] = Identity()
+model_ghost_git.layer_4[0] = module_ghost_1
+# model_ghost_git.layer_4[1] = module_ghost_4_1
+model_ghost_git.layer_5[0] = module_ghost_2
+# model_ghost_git.layer_5[1] = module_ghost_5_1
