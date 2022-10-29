@@ -20,7 +20,7 @@ lr_monitor = LearningRateMonitor(logging_interval='step')
 # use a GPU if available
 gpus = 1 if torch.cuda.is_available() else 0
 
-if not args.path_resume:
+if args.path_resume:
 
     import wandb
 
