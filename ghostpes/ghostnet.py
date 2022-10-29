@@ -258,8 +258,8 @@ output_channel_2 = _make_divisible(80, 4)
 hidden_channel_2 = _make_divisible(240, 4)
 # print("input_channel: ", hidden_channel)
 
-module_ghost_1  = GhostBottleneck(48, hidden_channel_1, output_channel_1, se_ratio=0.25)
-module_ghost_2  = GhostBottleneck(64, hidden_channel_2, output_channel_2, se_ratio=0.25)
+module_ghost_1  = GhostBottleneck(48, hidden_channel_1, output_channel_1, se_ratio=0.25, stride=2)
+module_ghost_2  = GhostBottleneck(64, hidden_channel_2, output_channel_2, se_ratio=0.25, stride=2)
 
 
 # if __name__=='__main__':
