@@ -14,6 +14,13 @@ model_ghost = ghostnet()
 
 model_ghost_git = MobileViT(opts)
 
+model_ghost_git.layer_1 = nn.Sequential(
+        *list(model_ghost.blocks.children())[:-5],
+    )
+model_ghost_git.layer_2 = nn.Conv2d(40, 48, 1)
+model_ghost_git.layer_3[0] = Identity()
+
+
 print(model_ghost_git(torch.ones((2,3,224,224))).shape)
 
 

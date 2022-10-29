@@ -75,8 +75,8 @@ class LitModel(pl.LightningModule):
         
         preds = torch.argmax(logits, dim=1)
         acc = self.accuracy(preds, y)
-        self.log('train_loss', loss, on_step=True, on_epoch=True, logger=True)
-        self.log('train_acc', acc, on_step=True, on_epoch=True, logger=True)
+        self.log('train_loss', loss, on_step=False, on_epoch=True, logger=True)
+        self.log('train_acc', acc, on_step=False, on_epoch=True, logger=True)
         
         return loss
     
@@ -88,8 +88,8 @@ class LitModel(pl.LightningModule):
         # validation metrics
         preds = torch.argmax(logits, dim=1)
         acc = self.accuracy(preds, y)
-        self.log('val_loss', loss, prog_bar=True)
-        self.log('val_acc', acc, prog_bar=True)
+        self.log('val_loss', loss, prog_bar=True, on_step=False, on_epoch=True)
+        self.log('val_acc', acc, prog_bar=True, on_step=False, on_epoch=True)
         return loss
     
     def test_step(self, batch, batch_idx):
@@ -100,8 +100,8 @@ class LitModel(pl.LightningModule):
         # validation metrics
         preds = torch.argmax(logits, dim=1)
         acc = self.accuracy(preds, y)
-        self.log('test_loss', loss, prog_bar=True)
-        self.log('test_acc', acc, prog_bar=True)
+        self.log('test_loss', loss, prog_bar=True, on_step=False, on_epoch=True)
+        self.log('test_acc', acc, prog_bar=True, on_step=False, on_epoch=True)
         return loss
     
     def configure_optimizers(self):
@@ -116,11 +116,16 @@ model_lit = LitModel()
 early_stop_callback = pl.callbacks.EarlyStopping(monitor="val_loss")
 checkpoint_callback = pl.callbacks.ModelCheckpoint()
 
+from pytorch_lightning.loggers import WandbLogger
+
+wandb_logger = WandbLogger(project="MocoSau_fine_tune", name="ghost_1")
+
+
 # Initialize a trainer
 trainer = pl.Trainer(max_epochs=10,
                      gpus=1, 
                     #  step-
-                    #  logger=wandb_logger,
+                     logger=wandb_logger,
                     #  callbacks=[early_stop_callback,
                     #             # ImagePredictionLogger(val_samples),
                     #             checkpoint_callback],
