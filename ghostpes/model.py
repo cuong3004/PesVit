@@ -2,7 +2,8 @@ from ghostpes.config import *
 from cvnets.models.classification.mobilevit import MobileViT
 import torch 
 import torch.nn as nn
-from ghostpes.ghostnet import ghostnet
+from ghostpes.ghostnet import ghostnet, module_ghost_1, module_ghost_2
+
 
 class Identity(nn.Module):
     def __init__(self):

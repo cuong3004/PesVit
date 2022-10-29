@@ -35,6 +35,12 @@ model_ghost_git.layer_3[0] = Identity()
 
 ## ghost_vit 2
 
+model_ghost_git.layer_2 = nn.Conv2d(40, 48, 1)
+model_ghost_git.layer_3[0] = Identity()
+model_ghost_git.layer_4[0] = module_ghost_1
+model_ghost_git.layer_5[0] = module_ghost_2
+////
+
 cfgs = [
         # k, t, c, SE, s 
         # stage1
@@ -64,6 +70,44 @@ cfgs = [
 
 ## ghost_vit_3
 
+model_ghost_git.layer_2 = nn.Conv2d(40, 48, 1)
+model_ghost_git.layer_3[0] = Identity()
+model_ghost_git.layer_3[1] = Identity()
+model_ghost_git.layer_4[0] = module_ghost_1
+model_ghost_git.layer_5[0] = module_ghost_2
+///
+
+def ghostnet(**kwargs):
+    """
+    Constructs a GhostNet model
+    """
+    cfgs = [
+        # k, t, c, SE, s 
+        # stage1
+        [[3,  16,  16, 0, 1]],
+        # stage2
+        [[3,  48,  24, 0, 2]],
+        [[3,  72,  24, 0, 1]],
+        # stage3
+        [[5,  72,  40, 0.25, 2]],
+        [[5, 120,  40, 0.25, 1], [3, 120,  40, 0.25, 1]],
+        # stage4
+        [[3, 240,  80, 0, 2]],
+        [[3, 200,  80, 0, 1],
+         [3, 184,  80, 0, 1],
+         [3, 184,  80, 0, 1],
+         [3, 480, 112, 0.25, 1],
+         [3, 672, 112, 0.25, 1]
+        ],
+        # stage5
+        [[5, 672, 160, 0.25, 2]],
+        [[5, 960, 160, 0, 1],
+         [5, 960, 160, 0.25, 1],
+         [5, 960, 160, 0, 1],
+         [5, 960, 160, 0.25, 1]
+        ]
+    ]
+    ///////
 cfgs = [
         # k, t, c, SE, s 
         # stage1
@@ -149,4 +193,5 @@ cfgs = [
          [5, 960, 160, 0.25, 1]
         ]
     ]
+
 
