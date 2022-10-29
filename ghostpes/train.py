@@ -11,6 +11,9 @@ import argparse
 parser  = argparse.ArgumentParser()
 parser.add_argument('--path_resume', type=str, default=None)
 args = parser.parse_args()
+print("-"*10)
+print(args)
+print("-"*10)
 
 lr_monitor = LearningRateMonitor(logging_interval='step')
 
