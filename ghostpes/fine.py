@@ -122,7 +122,7 @@ wandb_logger = WandbLogger(project="MocoSau_fine_tune", name="ghost_1")
 
 
 # Initialize a trainer
-trainer = pl.Trainer(max_epochs=10,
+trainer = pl.Trainer(max_epochs=30,
                      gpus=1, 
                     #  step-
                      logger=wandb_logger,

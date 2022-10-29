@@ -2,10 +2,10 @@ import argparse
 
 num_workers = 2
 img_size = 224
-batch_size = 128
+batch_size = 256
 memory_bank_size = 2048
 seed = 1
-max_epochs = 200
+max_epochs = 300
 
 path_to_train = "frame_video_sau"
 

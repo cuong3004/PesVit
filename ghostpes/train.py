@@ -12,7 +12,7 @@ lr_monitor = LearningRateMonitor(logging_interval='step')
 # use a GPU if available
 gpus = 1 if torch.cuda.is_available() else 0
 
-wandb_logger = WandbLogger(project="MocoSau", name="mobileVit_no_pretrain", log_model="all")
+wandb_logger = WandbLogger(project="MocoSau", name="ghost_vit_2_train", log_model="all")
 checkpoint_callback = ModelCheckpoint(monitor="train_loss_ssl", mode="min")
 model = MocoModel()
 # path_checkpoint = "/content/epoch=38-step=34164.ckpt"

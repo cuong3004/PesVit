@@ -75,8 +75,8 @@ class MocoModel(pl.LightningModule):
             'scheduler': torch.optim.lr_scheduler.CosineAnnealingLR(optim, T_max=10, eta_min=0),
             'name': 'my_logging_name',
         }
-        # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-        #     optim, max_epochs
-        # )
-        # return [optim], [lr_scheduler]
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optim, max_epochs
+        )
+        return [optim], [lr_scheduler]
         return optim
