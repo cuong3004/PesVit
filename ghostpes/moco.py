@@ -99,7 +99,7 @@ class MocoModel(pl.LightningModule):
         # result = accuracy(logit, loss)
         # result = accuracy(logit, label)
 
-        self.log("train_loss_ssl", loss)
+        self.log("train_loss_ssl", loss,  on_step=False, on_epoch=True)
         return loss
     
     def validation_step(self, batch, batch_idx):
@@ -118,9 +118,9 @@ class MocoModel(pl.LightningModule):
 
         result = accuracy(logit, label)
 
-        self.log("valid_loss_ssl", loss)
-        self.log("valid_acc_top1_ssl", result[0])
-        self.log("valid_acc_top5_ssl", result[1])
+        self.log("valid_loss_ssl", loss, on_step=False, on_epoch=True)
+        self.log("valid_acc_top1_ssl", result[0], on_step=False, on_epoch=True)
+        self.log("valid_acc_top5_ssl", result[1], on_step=False, on_epoch=True)
         return loss
 
     def configure_optimizers(self):

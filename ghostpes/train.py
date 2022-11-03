@@ -10,6 +10,8 @@ import argparse
 
 parser  = argparse.ArgumentParser()
 parser.add_argument('--path_resume', type=str, default=None)
+parser.add_argument('--name', type=str)
+
 args = parser.parse_args()
 print("-"*10)
 print(args)
