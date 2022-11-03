@@ -1,7 +1,7 @@
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.callbacks import LearningRateMonitor
-from ghostpes.dataset import dataloader_train_moco
+from ghostpes.dataset import dataloader_train_moco, dataloader_valid_moco
 from ghostpes.config import *
 from ghostpes.moco import MocoModel
 import pytorch_lightning as pl
@@ -35,7 +35,7 @@ if args.path_resume:
     wandb.finish()
 
 
-    wandb_logger = WandbLogger(project="MocoSau", name="ghost_vit_2_train", log_model="all")
+    wandb_logger = WandbLogger(project="MocoSau", name="ghost_vit_2_train_v2", log_model="all")
     checkpoint_callback = ModelCheckpoint(monitor="train_loss_ssl", mode="min")
     # model = MocoModel()
     # path_checkpoint = "/content/epoch=38-step=34164.ckpt"
@@ -82,4 +82,5 @@ else:
 trainer.fit(
     model,
     dataloader_train_moco,
+    dataloader_valid_moco,
 )

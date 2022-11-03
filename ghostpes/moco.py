@@ -13,15 +13,48 @@ import lightly
 
 from ghostpes.config import * 
 
-class MocoModel(pl.LightningModule):
+class IdentityLoss(nn.Module):
     def __init__(self):
         super().__init__()
+    def forward(self, q, k):
+        return q, k
+
+def accuracy(output, target, topk=(1,5)):
+    """Computes the precision@k for the specified values of k"""
+    maxk = max(topk)
+    batch_size = target.size(0)
+
+    _, pred = output.topk(maxk, 1, True, True)
+    pred = pred.t()
+    correct = pred.eq(target.view(1, -1).expand_as(pred))
+
+    res = []
+    for k in topk:
+        # print(correct[:k].shape)
+        # print(correct[:k].view(-1).shape)
+        correct_k = correct[:k].reshape(-1).float().sum(0)
+        res.append(correct_k.mul_(100.0 / batch_size))
+    return res
+
+class MyNCELoss(lightly.loss.NTXentLoss):
+    def __init__(self, temperature: float = 0.5, memory_bank_size: int = 0, gather_distributed: bool = False):
+        super().__init__(temperature, memory_bank_size, gather_distributed)
+        self.cross_entropy = IdentityLoss()
+    def forward(self, out0: torch.Tensor, out1: torch.Tensor):
+        return super().forward(out0, out1)
+
+class MocoModel(pl.LightningModule):
+    def __init__(self, temp=0.1, learning_rate=0.0005, momentum=0.99):
+        super().__init__()
+
+        self.save_hyperparameters()
 
         model = model_ghost_git
         # model.load_state_dict(torch.load("mobilevit_xxs.pt"))
         # model = mobilevit_xs()
         model.classifier.fc = nn.Linear(320, 512)
         self.backbone = model
+        self.crossEntropy = nn.CrossEntropyLoss(reduction="mean")
         # self.backbone = nn.Sequential(
         #     *list(resnet.children())[:-1],
         #     nn.Linear(1280, 512),
@@ -39,16 +72,17 @@ class MocoModel(pl.LightningModule):
 
         # create our loss with the optional memory bank
         self.criterion = lightly.loss.NTXentLoss(
-            temperature=0.1,
+            temperature=self.hparams.temp,
             memory_bank_size=memory_bank_size)
 
     def training_step(self, batch, batch_idx):
         (x_q, x_k), _, _ = batch
 
         # update momentum
-        update_momentum(self.backbone, self.backbone_momentum, 0.99)
         update_momentum(
-            self.projection_head, self.projection_head_momentum, 0.99
+            self.backbone, self.backbone_momentum, self.hparams.momentum)
+        update_momentum(
+            self.projection_head, self.projection_head_momentum, self.hparams.momentum
         )
 
         q = self.backbone(x_q).flatten(start_dim=1)
@@ -59,8 +93,34 @@ class MocoModel(pl.LightningModule):
         k = self.projection_head_momentum(k)
         k = batch_unshuffle(k, shuffle)
 
-        loss = self.criterion(q, k)
+        logit, label = self.criterion(q, k)
+        loss = self.crossEntropy(logit, label)
+        
+        # result = accuracy(logit, loss)
+        # result = accuracy(logit, label)
+
         self.log("train_loss_ssl", loss)
+        return loss
+    
+    def validation_step(self, batch, batch_idx):
+        (x_q, x_k), _, _ = batch
+
+        q = self.backbone(x_q).flatten(start_dim=1)
+        q = self.projection_head(q)
+
+        k, shuffle = batch_shuffle(x_k)
+        k = self.backbone_momentum(k).flatten(start_dim=1)
+        k = self.projection_head_momentum(k)
+        k = batch_unshuffle(k, shuffle)
+
+        logit, label = self.criterion(q, k)
+        loss = self.crossEntropy(logit, label)
+
+        result = accuracy(logit, loss)
+
+        self.log("valid_loss_ssl", loss)
+        self.log("valid_acc_top1_ssl", result[0])
+        self.log("valid_acc_top5_ssl", result[1])
         return loss
 
     def configure_optimizers(self):
@@ -70,13 +130,13 @@ class MocoModel(pl.LightningModule):
         #     momentum=0.9,
         #     weight_decay=5e-4,
         # )
-        optim = torch.optim.Adam(self.parameters(), lr=0.001)
-        lr_scheduler = {
-            'scheduler': torch.optim.lr_scheduler.CosineAnnealingLR(optim, T_max=10, eta_min=0),
-            'name': 'my_logging_name',
-        }
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-            optim, max_epochs
-        )
-        return [optim], [lr_scheduler]
+        optim = torch.optim.Adam(self.parameters(), lr=self.hparams.learning_rate)
+        # lr_scheduler = {
+        #     'scheduler': torch.optim.lr_scheduler.CosineAnnealingLR(optim, T_max=10, eta_min=0),
+        #     'name': 'my_logging_name',
+        # }
+        # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+        #     optim, max_epochs
+        # )
+        # return [optim], [lr_scheduler]
         return optim
