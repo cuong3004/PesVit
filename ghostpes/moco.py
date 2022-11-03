@@ -71,7 +71,7 @@ class MocoModel(pl.LightningModule):
         deactivate_requires_grad(self.projection_head_momentum)
 
         # create our loss with the optional memory bank
-        self.criterion = lightly.loss.NTXentLoss(
+        self.criterion = MyNCELoss(
             temperature=self.hparams.temp,
             memory_bank_size=memory_bank_size)
 
@@ -116,7 +116,7 @@ class MocoModel(pl.LightningModule):
         logit, label = self.criterion(q, k)
         loss = self.crossEntropy(logit, label)
 
-        result = accuracy(logit, loss)
+        result = accuracy(logit, label)
 
         self.log("valid_loss_ssl", loss)
         self.log("valid_acc_top1_ssl", result[0])
