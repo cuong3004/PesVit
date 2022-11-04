@@ -11,7 +11,9 @@ import argparse
 parser  = argparse.ArgumentParser()
 parser.add_argument('--path_resume', type=str, default=None)
 parser.add_argument('--name', type=str)
-parser = MocoModel.add_model_specific_args(parser)
+parser.add_argument('--temp', type=float, default=0.1)
+parser.add_argument('--learning_rate', type=float, default=0.0005)
+parser.add_argument('--momentum', type=float, default=0.99)
 
 args = parser.parse_args()
 print("-"*10)
@@ -38,12 +40,14 @@ if args.path_resume:
     wandb.finish()
 
 
-    wandb_logger = WandbLogger(project="MocoSau", name="ghost_vit_2_train_v2", log_model="all")
+    wandb_logger = WandbLogger(project="MocoSau", name=args.name, log_model="all")
     checkpoint_callback = ModelCheckpoint(monitor="train_loss_ssl", mode="min")
     # model = MocoModel()
     # path_checkpoint = "/content/epoch=38-step=34164.ckpt"
     model = MocoModel.load_from_checkpoint(path_checkpoint)
-    trainer = pl.Trainer(max_epochs=max_epochs, gpus=gpus,
+    trainer = pl.Trainer(max_epochs=max_epochs,
+    #  gpus=gpus,
+                        accelerator='gpu', devices=1,
                         #  default_root_dir="/content/drive/MyDrive/log_moco_sau",
                          resume_from_checkpoint=path_checkpoint,
                         #  limit_train_batches=20,
@@ -66,12 +70,14 @@ else:
     # wandb.finish()
 
 
-    wandb_logger = WandbLogger(project="MocoSau", name="ghost_vit_2_train", log_model="all")
+    wandb_logger = WandbLogger(project="MocoSau", name=args.name, log_model="all")
     checkpoint_callback = ModelCheckpoint(monitor="train_loss_ssl", mode="min")
-    model = MocoModel()
+    model = MocoModel(args.temp, args.learning_rate, args.momentum)
     # path_checkpoint = "/content/epoch=38-step=34164.ckpt"
     # model = MocoModel.load_from_checkpoint(path_checkpoint)
-    trainer = pl.Trainer(max_epochs=max_epochs, gpus=gpus,
+    trainer = pl.Trainer(max_epochs=max_epochs,
+                        #  gpus=gpus,
+                        accelerator='gpu', devices=1,
                         #  default_root_dir="/content/drive/MyDrive/log_moco_sau",
                         #  resume_from_checkpoint=path_checkpoint,
                         #  limit_train_batches=20,
