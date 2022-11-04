@@ -16,7 +16,7 @@ dataset_full_moco = lightly.data.LightlyDataset(
 )
 len_train = int(len(dataset_full_moco) * 0.8)
 len_valid = len(dataset_full_moco) - len_train
-train_set, val_set = torch.utils.data.random_split(dataset_full_moco, [len_train, len_valid])
+train_set, val_set = torch.utils.data.random_split(dataset_full_moco, [len_train, len_valid], torch.Generator().manual_seed(42))
 
 dataloader_train_moco = torch.utils.data.DataLoader(
     train_set,
