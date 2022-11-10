@@ -7,7 +7,7 @@ from torch import nn
 from torch.nn import functional as F
 from torch.utils.data import random_split, DataLoader
 from torchvision.datasets import ImageFolder
-from torchmetrics import Accuracy
+from torchmetrics import Accuracy, Precision, Recall
 
 from torchvision import transforms
 from model import model_ghost_git
@@ -67,6 +67,8 @@ class LitModel(pl.LightningModule):
         self.model = model
 
         self.accuracy = Accuracy()
+        self.pre = Precision(num_classes=1, multiclass=False)
+        self.rec = Recall(num_classes=1, multiclass=False)
     
     def training_step(self, batch, batch_idx):
         x, y = batch
@@ -75,8 +77,12 @@ class LitModel(pl.LightningModule):
         
         preds = torch.argmax(logits, dim=1)
         acc = self.accuracy(preds, y)
+        pre = self.pre(preds, y)
+        rec = self.rec(preds, y)
         self.log('train_loss', loss, on_step=False, on_epoch=True, logger=True)
         self.log('train_acc', acc, on_step=False, on_epoch=True, logger=True)
+        self.log('train_pre', pre, on_step=False, on_epoch=True, logger=True)
+        self.log('train_rec', rec, on_step=False, on_epoch=True, logger=True)
         
         return loss
     
@@ -88,8 +94,12 @@ class LitModel(pl.LightningModule):
         # validation metrics
         preds = torch.argmax(logits, dim=1)
         acc = self.accuracy(preds, y)
+        pre = self.pre(preds, y)
+        rec = self.rec(preds, y)
         self.log('val_loss', loss, prog_bar=True, on_step=False, on_epoch=True)
         self.log('val_acc', acc, prog_bar=True, on_step=False, on_epoch=True)
+        self.log('val_pre', pre, on_step=False, on_epoch=True, logger=True)
+        self.log('val_rec', rec, on_step=False, on_epoch=True, logger=True)
         return loss
     
     def test_step(self, batch, batch_idx):
