@@ -19,15 +19,15 @@ class PesDataModule(pl.LightningDataModule):
         self.batch_size = batch_size
 
         self.transform_train = transforms.Compose([
-            transforms.Resize((224,224)),
+            # transforms.Resize((256,256)),
             transforms.ToTensor(),
             transforms.RandomHorizontalFlip(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
         ])
 
         self.transform_valid = transforms.Compose([
             transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
         ])
         
         self.num_classes = 2
@@ -67,8 +67,8 @@ class LitModel(pl.LightningModule):
         self.model = model
 
         self.accuracy = Accuracy()
-        self.pre = Precision(num_classes=1, multiclass=False)
-        self.rec = Recall(num_classes=1, multiclass=False)
+        self.pre = Precision(num_classes=2)
+        self.rec = Recall(num_classes=2)
     
     def training_step(self, batch, batch_idx):
         x, y = batch
