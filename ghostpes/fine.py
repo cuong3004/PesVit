@@ -11,6 +11,37 @@ from torchmetrics import Accuracy, Precision, Recall
 
 from torchvision import transforms
 from model import model_ghost_git
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
+
+
+
+
+
+transform_train = A.Compose([
+    A.Blur(),
+    A.Cutout(),
+    A.ISONoise(p=0.7),
+    A.RandomBrightnessContrast(),
+    A.ColorJitter(),
+    A.HorizontalFlip(),
+    A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+    ToTensorV2(),
+])
+
+transform_valid = A.Compose([
+    A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+    ToTensorV2(),
+])
+
+def trans_func_train(image):
+    image_aug = transform_train(image=image)['image']
+    return image_aug
+
+def trans_func_valid(image):
+    image_aug = transform_valid(image=image)['image']
+    return image_aug
+
 
 
 class PesDataModule(pl.LightningDataModule):
@@ -18,17 +49,9 @@ class PesDataModule(pl.LightningDataModule):
         super().__init__()
         self.batch_size = batch_size
 
-        self.transform_train = transforms.Compose([
-            # transforms.Resize((256,256)),
-            transforms.ToTensor(),
-            transforms.RandomHorizontalFlip(),
-            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
-        ])
+        self.transform_train = trans_func_train
 
-        self.transform_valid = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
-        ])
+        self.transform_valid = trans_func_valid
         
         self.num_classes = 2
 
@@ -102,17 +125,17 @@ class LitModel(pl.LightningModule):
         self.log('val_rec', rec, on_step=False, on_epoch=True, logger=True)
         return loss
     
-    def test_step(self, batch, batch_idx):
-        x, y = batch
-        logits = self.model(x)
-        loss = F.cross_entropy(logits, y)
+    # def test_step(self, batch, batch_idx):
+    #     x, y = batch
+    #     logits = self.model(x)
+    #     loss = F.cross_entropy(logits, y)
         
-        # validation metrics
-        preds = torch.argmax(logits, dim=1)
-        acc = self.accuracy(preds, y)
-        self.log('test_loss', loss, prog_bar=True, on_step=False, on_epoch=True)
-        self.log('test_acc', acc, prog_bar=True, on_step=False, on_epoch=True)
-        return loss
+    #     # validation metrics
+    #     preds = torch.argmax(logits, dim=1)
+    #     acc = self.accuracy(preds, y)
+    #     self.log('test_loss', loss, prog_bar=True, on_step=False, on_epoch=True)
+    #     self.log('test_acc', acc, prog_bar=True, on_step=False, on_epoch=True)
+    #     return loss
     
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=1e-4)
@@ -123,19 +146,19 @@ dm = PesDataModule(batch_size=32)
 
 model_lit = LitModel()
 
-early_stop_callback = pl.callbacks.EarlyStopping(monitor="val_loss")
+# early_stop_callback = pl.callbacks.EarlyStopping(monitor="val_loss")
 checkpoint_callback = pl.callbacks.ModelCheckpoint()
 
 from pytorch_lightning.loggers import WandbLogger
 
-wandb_logger = WandbLogger(project="MocoSau_fine_tune", name="ghost_1")
+wandb_logger = WandbLogger(project="MocoSau_fine_tune_3", name="ghost_2")
 
 
 # Initialize a trainer
 trainer = pl.Trainer(max_epochs=100,
                      gpus=1, 
                     #  step-
-                    limit_train_batches=0.3,
+                    # limit_train_batches=0.3,
                      logger=wandb_logger,
                     #  callbacks=[early_stop_callback,
                     #             # ImagePredictionLogger(val_samples),
