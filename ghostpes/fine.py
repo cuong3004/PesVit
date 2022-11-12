@@ -132,9 +132,10 @@ wandb_logger = WandbLogger(project="MocoSau_fine_tune", name="ghost_1")
 
 
 # Initialize a trainer
-trainer = pl.Trainer(max_epochs=30,
+trainer = pl.Trainer(max_epochs=100,
                      gpus=1, 
                     #  step-
+                    limit_train_batches=0.3,
                      logger=wandb_logger,
                     #  callbacks=[early_stop_callback,
                     #             # ImagePredictionLogger(val_samples),
