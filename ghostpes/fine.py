@@ -13,7 +13,7 @@ from torchvision import transforms
 from model import model_ghost_git
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
-
+import numpy as np
 
 
 
@@ -35,10 +35,12 @@ transform_valid = A.Compose([
 ])
 
 def trans_func_train(image):
+    image = np.asarray(image)
     image_aug = transform_train(image=image)['image']
     return image_aug
 
 def trans_func_valid(image):
+    image = np.asarray(image)
     image_aug = transform_valid(image=image)['image']
     return image_aug
 
