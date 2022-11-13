@@ -15,7 +15,10 @@ import albumentations as A
 from albumentations.pytorch import ToTensorV2
 import numpy as np
 
+import random
 
+random.seed(43)
+torch.manual_seed(43)
 
 
 transform_train = A.Compose([
@@ -153,7 +156,7 @@ checkpoint_callback = pl.callbacks.ModelCheckpoint()
 
 from pytorch_lightning.loggers import WandbLogger
 
-wandb_logger = WandbLogger(project="MocoSau_fine_tune_3", name="ghost_2")
+wandb_logger = WandbLogger(project="MocoSau_fine_tune_3", name="ghost_new_2")
 
 
 # Initialize a trainer
