@@ -226,11 +226,11 @@ def ghostnet(**kwargs):
         # stage1
         [[3,  16,  16, 0, 1]],
         # stage2
-        [[3,  48,  24, 1, 2]],
-        [[3,  72,  24, 1, 1]],
+        [[3,  48,  24, 0, 2]],
+        [[3,  72,  24, 0, 1]],
         # stage3
-        [[3,  96,  48, 1, 2]],
-        # [[3, 120,  48, 0.25, 1]],
+        [[5,  96,  48, 0.25, 2]],
+        [[5, 120,  48, 0.25, 1], [5, 120,  48, 0.25, 1]],
         # stage4
         [[3, 240,  80, 0, 2]],
         [[3, 200,  80, 0, 1],
@@ -258,8 +258,15 @@ output_channel_2 = _make_divisible(80, 4)
 hidden_channel_2 = _make_divisible(240, 4)
 # print("input_channel: ", hidden_channel)
 
-module_ghost_1  = GhostBottleneck(48, hidden_channel_1, output_channel_1, se_ratio=0.25, stride=2)
-module_ghost_2  = GhostBottleneck(64, hidden_channel_2, output_channel_2, se_ratio=0.25, stride=2)
+module_ghost_1  = nn.Sequential(
+                    GhostBottleneck(48, hidden_channel_1, output_channel_1, se_ratio=0.25, stride=2),
+                    GhostBottleneck(48, hidden_channel_1, output_channel_1, se_ratio=0.25, stride=2),
+                    )
+
+module_ghost_2 = nn.Sequential(
+                    GhostBottleneck(64, hidden_channel_2, output_channel_2, se_ratio=0.25, stride=2),
+                    GhostBottleneck(64, hidden_channel_2, output_channel_2, se_ratio=0.25, stride=2),
+                )
 
 
 # if __name__=='__main__':
