@@ -24,7 +24,7 @@ torch.manual_seed(43)
 transform_train = A.Compose([
     A.Blur(),
     A.Cutout(),
-    A.ISONoise(p=0.7),
+    A.ISONoise(),
     A.RandomBrightnessContrast(),
     A.ColorJitter(),
     A.HorizontalFlip(),
@@ -57,6 +57,7 @@ class PesDataModule(pl.LightningDataModule):
         self.transform_train = trans_func_train
 
         self.transform_valid = trans_func_valid
+        self.transform_test = trans_func_valid
         
         self.num_classes = 2
 
@@ -64,6 +65,7 @@ class PesDataModule(pl.LightningDataModule):
         if stage == 'fit' or stage is None:
             self.data_train = ImageFolder("/content/dataset/train", transform=self.transform_train)
             self.data_val = ImageFolder("/content/dataset/valid", transform=self.transform_valid)
+            self.data_val = ImageFolder("/content/dataset/test", transform=self.transform_test)
 
     def train_dataloader(self):
         return DataLoader(self.data_train, batch_size=self.batch_size, shuffle=True)
@@ -71,8 +73,8 @@ class PesDataModule(pl.LightningDataModule):
     def val_dataloader(self):
         return DataLoader(self.data_val, batch_size=self.batch_size)
 
-    # def test_dataloader(self):
-    #     return DataLoader(self.cifar_test, batch_size=self.batch_size)
+    def test_dataloader(self):
+        return DataLoader(self.data_val, batch_size=self.batch_size)
 
 
 class LitModel(pl.LightningModule):
@@ -124,35 +126,39 @@ class LitModel(pl.LightningModule):
         acc = self.accuracy(preds, y)
         pre = self.pre(preds, y)
         rec = self.rec(preds, y)
-        self.log('val_loss', loss, prog_bar=True, on_step=False, on_epoch=True)
-        self.log('val_acc', acc, prog_bar=True, on_step=False, on_epoch=True)
-        self.log('val_pre', pre, on_step=False, on_epoch=True, logger=True)
-        self.log('val_rec', rec, on_step=False, on_epoch=True, logger=True)
+        self.log('val_loss', loss, on_step=False, on_epoch=True)
+        self.log('val_acc', acc, on_step=False, on_epoch=True)
+        self.log('val_pre', pre, on_step=False, on_epoch=True)
+        self.log('val_rec', rec, on_step=False, on_epoch=True)
         return loss
     
-    # def test_step(self, batch, batch_idx):
-    #     x, y = batch
-    #     logits = self.model(x)
-    #     loss = F.cross_entropy(logits, y)
-        
-    #     # validation metrics
-    #     preds = torch.argmax(logits, dim=1)
-    #     acc = self.accuracy(preds, y)
-    #     self.log('test_loss', loss, prog_bar=True, on_step=False, on_epoch=True)
-    #     self.log('test_acc', acc, prog_bar=True, on_step=False, on_epoch=True)
-    #     return loss
+    def test_step(self, batch, batch_idx):
+        x, y = batch
+        logits = self.model(x)
+        loss = F.cross_entropy(logits, y)
+
+        # validation metrics
+        preds = torch.argmax(logits, dim=1)
+        acc = self.accuracy(preds, y)
+        pre = self.pre(preds, y)
+        rec = self.rec(preds, y)
+        self.log('test_loss', loss, on_step=False, on_epoch=True)
+        self.log('test_acc', acc, on_step=False, on_epoch=True)
+        self.log('test_pre', pre, on_step=False, on_epoch=True)
+        self.log('test_rec', rec, on_step=False, on_epoch=True)
+        return loss
     
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=1e-4)
         return optimizer
 
 
-dm = PesDataModule(batch_size=32)
+dm = PesDataModule(batch_size=50)
 
 model_lit = LitModel()
 
 # early_stop_callback = pl.callbacks.EarlyStopping(monitor="val_loss")
-checkpoint_callback = pl.callbacks.ModelCheckpoint()
+checkpoint_callback = pl.callbacks.ModelCheckpoint(monitor="val_loss", mode='min')
 
 from pytorch_lightning.loggers import WandbLogger
 
@@ -160,14 +166,15 @@ wandb_logger = WandbLogger(project="MocoSau_fine_tune_3", name="ghost_new_2")
 
 
 # Initialize a trainer
-trainer = pl.Trainer(max_epochs=100,
+trainer = pl.Trainer(max_epochs=200,
                      gpus=1, 
                     #  step-
                     # limit_train_batches=0.3,
                      logger=wandb_logger,
-                    #  callbacks=[early_stop_callback,
-                    #             # ImagePredictionLogger(val_samples),
-                    #             checkpoint_callback],
+                     callbacks=[
+                        #  early_stop_callback,
+                                # ImagePredictionLogger(val_samples),
+                                checkpoint_callback],
                      )
 
 # Train the model ⚡🚅⚡
