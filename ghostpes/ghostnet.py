@@ -260,12 +260,12 @@ hidden_channel_2 = _make_divisible(240, 4)
 
 module_ghost_1  = nn.Sequential(
                     GhostBottleneck(48, hidden_channel_1, output_channel_1, se_ratio=0.25, stride=2),
-                    GhostBottleneck(48, hidden_channel_1, output_channel_1, se_ratio=0.25, stride=2),
+                    GhostBottleneck(output_channel_1, hidden_channel_1, output_channel_1, se_ratio=0.25, stride=1),
                     )
 
 module_ghost_2 = nn.Sequential(
                     GhostBottleneck(64, hidden_channel_2, output_channel_2, se_ratio=0.25, stride=2),
-                    GhostBottleneck(64, hidden_channel_2, output_channel_2, se_ratio=0.25, stride=2),
+                    GhostBottleneck(output_channel_2, hidden_channel_2, output_channel_2, se_ratio=0.25, stride=1),
                 )
 
 
