@@ -24,6 +24,9 @@ model_ghost_git.layer_3[0] = Identity()
 model_ghost_git.layer_4[0] = module_ghost_1
 model_ghost_git.layer_5[0] = module_ghost_2
 
+print(nn.Sequential(
+        *list(model_ghost.blocks.children())[:-5],
+    ))
 
 print(model_ghost_git(torch.ones((2,3,224,224))).shape)
 
