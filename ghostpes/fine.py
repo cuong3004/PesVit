@@ -22,12 +22,12 @@ torch.manual_seed(43)
 
 
 transform_train = A.Compose([
-    A.Blur(),
-    A.Cutout(),
-    A.ISONoise(),
-    A.RandomBrightnessContrast(),
-    A.ColorJitter(),
-    A.HorizontalFlip(),
+    # A.Blur(),
+    # A.Cutout(),
+    # A.ISONoise(),
+    # A.RandomBrightnessContrast(),
+    # A.ColorJitter(),
+    # A.HorizontalFlip(),
     A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
     ToTensorV2(),
 ])
@@ -65,7 +65,7 @@ class PesDataModule(pl.LightningDataModule):
         if stage == 'fit' or stage is None:
             self.data_train = ImageFolder("/content/dataset/train", transform=self.transform_train)
             self.data_val = ImageFolder("/content/dataset/valid", transform=self.transform_valid)
-            self.data_val = ImageFolder("/content/dataset/test", transform=self.transform_test)
+            # self.data_val = ImageFolder("/content/dataset/test", transform=self.transform_test)
 
     def train_dataloader(self):
         return DataLoader(self.data_train, batch_size=self.batch_size, shuffle=True)
@@ -73,8 +73,8 @@ class PesDataModule(pl.LightningDataModule):
     def val_dataloader(self):
         return DataLoader(self.data_val, batch_size=self.batch_size)
 
-    def test_dataloader(self):
-        return DataLoader(self.data_val, batch_size=self.batch_size)
+    # def test_dataloader(self):
+    #     return DataLoader(self.data_val, batch_size=self.batch_size)
 
 
 class LitModel(pl.LightningModule):
@@ -162,11 +162,11 @@ checkpoint_callback = pl.callbacks.ModelCheckpoint(monitor="val_loss", mode='min
 
 from pytorch_lightning.loggers import WandbLogger
 
-wandb_logger = WandbLogger(project="MocoSau_fine_tune_4", name="ghost_2_ver0", log_model="all")
+wandb_logger = WandbLogger(project="MocoSau_fine_tune_5", name="ghost_2", log_model="all")
 
 
 # Initialize a trainer
-trainer = pl.Trainer(max_epochs=200,
+trainer = pl.Trainer(max_epochs=50,
                      gpus=1, 
                     #  step-
                     # limit_train_batches=0.3,
