@@ -164,7 +164,7 @@ checkpoint_callback = pl.callbacks.ModelCheckpoint(monitor="val_acc", mode='max'
 
 from pytorch_lightning.loggers import WandbLogger
 
-wandb_logger = WandbLogger(project="MocoSau_fine_tune_5", name="ghost_2", log_model="all")
+wandb_logger = WandbLogger(project="MocoSau_fine_tune_6", name="ghost_2", log_model="all")
 
 
 # Initialize a trainer
