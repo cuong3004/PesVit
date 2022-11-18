@@ -97,8 +97,8 @@ class LitModel(pl.LightningModule):
         self.model = model
 
         self.accuracy = Accuracy()
-        self.pre = Precision(num_classes=2)
-        self.rec = Recall(num_classes=2)
+        self.pre = Precision(num_classes=2, average='macro')
+        self.rec = Recall(num_classes=2, average='macro')
     
     def training_step(self, batch, batch_idx):
         x, y = batch
