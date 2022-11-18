@@ -76,6 +76,8 @@ class PesDataModule(pl.LightningDataModule):
     # def test_dataloader(self):
     #     return DataLoader(self.data_val, batch_size=self.batch_size)
 
+from torchmetrics.functional import accuracy, precision, recall
+average = 'macro'
 
 class LitModel(pl.LightningModule):
     def __init__(self):
@@ -96,19 +98,19 @@ class LitModel(pl.LightningModule):
 
         self.model = model
 
-        self.accuracy = Accuracy()
-        self.pre = Precision(num_classes=2, average='macro')
-        self.rec = Recall(num_classes=2, average='macro')
+        self.acc = accuracy
+        self.pre = precision
+        self.rec = recall
     
     def training_step(self, batch, batch_idx):
         x, y = batch
         logits = self.model(x)
         loss = F.cross_entropy(logits, y)
         
-        preds = torch.argmax(logits, dim=1)
-        acc = self.accuracy(preds, y)
-        pre = self.pre(preds, y)
-        rec = self.rec(preds, y)
+        # preds = torch.argmax(logits, dim=1)
+        acc = self.acc(logits, y, num_classes=2)
+        pre = self.pre(logits, y, average=average, num_classes=2)
+        rec = self.rec(logits, y, average=average, num_classes=2)
         self.log('train_loss', loss, on_step=False, on_epoch=True, logger=True)
         self.log('train_acc', acc, on_step=False, on_epoch=True, logger=True)
         self.log('train_pre', pre, on_step=False, on_epoch=True, logger=True)
@@ -122,10 +124,10 @@ class LitModel(pl.LightningModule):
         loss = F.cross_entropy(logits, y)
 
         # validation metrics
-        preds = torch.argmax(logits, dim=1)
-        acc = self.accuracy(preds, y)
-        pre = self.pre(preds, y)
-        rec = self.rec(preds, y)
+        # preds = torch.argmax(logits, dim=1)
+        acc = self.acc(logits, y, num_classes=2)
+        pre = self.pre(logits, y, average=average, num_classes=2)
+        rec = self.rec(logits, y, average=average, num_classes=2)
         self.log('val_loss', loss, on_step=False, on_epoch=True)
         self.log('val_acc', acc, on_step=False, on_epoch=True)
         self.log('val_pre', pre, on_step=False, on_epoch=True)
@@ -138,7 +140,7 @@ class LitModel(pl.LightningModule):
         loss = F.cross_entropy(logits, y)
 
         # validation metrics
-        preds = torch.argmax(logits, dim=1)
+        # preds = torch.argmax(logits, dim=1)
         acc = self.accuracy(preds, y)
         pre = self.pre(preds, y)
         rec = self.rec(preds, y)
