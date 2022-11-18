@@ -160,7 +160,7 @@ dm = PesDataModule(batch_size=50)
 model_lit = LitModel()
 
 # early_stop_callback = pl.callbacks.EarlyStopping(monitor="val_loss")
-checkpoint_callback = pl.callbacks.ModelCheckpoint(monitor="val_loss", mode='min')
+checkpoint_callback = pl.callbacks.ModelCheckpoint(monitor="val_acc", mode='max')
 
 from pytorch_lightning.loggers import WandbLogger
 
