@@ -121,21 +121,27 @@ class LitModel(pl.LightningModule):
         
         return loss
     
-    def validation_step(self, batch, batch_idx):
-        x, y = batch
-        logits = self.model(x)
-        loss = F.cross_entropy(logits, y)
+    # def validation_step(self, batch, batch_idx):
+    #     x, y = batch
+    #     logits = self.model(x)
+    #     loss = F.cross_entropy(logits, y)
 
-        # validation metrics
-        # preds = torch.argmax(logits, dim=1)
-        acc = self.acc(logits, y, num_classes=2)
-        # pre = self.pre(logits, y, average=average, num_classes=2)
-        # rec = self.rec(logits, y, average=average, num_classes=2)
-        self.log('val_loss', loss, on_step=False, on_epoch=True)
-        # self.log('val_acc', acc, on_step=False, on_epoch=True)
-        # self.log('val_pre', pre, on_step=False, on_epoch=True)
-        # self.log('val_rec', rec, on_step=False, on_epoch=True)
-        return loss
+    #     # validation metrics
+    #     # preds = torch.argmax(logits, dim=1)
+    #     acc = self.acc(logits, y, num_classes=2)
+    #     # pre = self.pre(logits, y, average=average, num_classes=2)
+    #     # rec = self.rec(logits, y, average=average, num_classes=2)
+    #     self.log('val_loss', loss, on_step=False, on_epoch=True)
+    #     # self.log('val_acc', acc, on_step=False, on_epoch=True)
+    #     # self.log('val_pre', pre, on_step=False, on_epoch=True)
+    #     # self.log('val_rec', rec, on_step=False, on_epoch=True)
+    #     return loss
+    
+    def on_train_start(self):
+        self.log('val_acc', 0)
+        self.log('val_pre', 0)
+        self.log('val_rec', 0)
+        self.log('val_f1', 0)
     
     def on_train_epoch_end(self):
         
@@ -145,7 +151,7 @@ class LitModel(pl.LightningModule):
         all_preds = []
         all_labels = []
         
-        for batch in self.val_dataloader():
+        for batch in dm.val_dataloader():
             with torch.no_grad():
                 x, y= batch
                 x = x.to(self.device)
@@ -221,9 +227,3 @@ trainer = pl.Trainer(max_epochs=50,
 # Train the model ⚡🚅⚡
 trainer.fit(model_lit, dm)
 trainer.test(model_lit, dm)
-
-
-# model_lit.eval()
-
-# all_preds = []
-# for batch in tqdm(test_loader):
