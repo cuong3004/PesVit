@@ -159,12 +159,15 @@ class LitModel(pl.LightningModule):
         all_preds = torch.cat(all_preds,dim=0)
         all_labels = torch.cat(all_labels,dim=0)
         
-        print("-----Start------")
-        print("acc", accuracy(all_preds, all_labels))
-        print("f1", f1_score(all_preds, all_labels, average=average, num_classes=2))
-        print("pre", precision(all_preds, all_labels, average=average, num_classes=2)))
-        print("recall", recall(all_preds, all_labels, average=average, num_classes=2)))
-        print("-----End------")
+        acc = accuracy(all_preds, all_labels)
+        pre = precision(all_preds, all_labels, average=average, num_classes=2)
+        rec = recall(all_preds, all_labels, average=average, num_classes=2)
+        f1 = f1_score(all_preds, all_labels, average=average, num_classes=2)
+        
+        self.log('val_acc', acc)
+        self.log('val_pre', pre)
+        self.log('val_rec', rec)
+        self.log('val_f1', f1)
         
         # print("accuracy")
         
@@ -200,7 +203,7 @@ checkpoint_callback = pl.callbacks.ModelCheckpoint(monitor="val_acc", mode='max'
 
 from pytorch_lightning.loggers import WandbLogger
 
-wandb_logger = WandbLogger(project="MocoSau_fine_tune_7", name="ghost_2", log_model="all")
+wandb_logger = WandbLogger(project="MocoSau_fine_tune_8", name="ghost_2", log_model="all")
 
 
 # Initialize a trainer
