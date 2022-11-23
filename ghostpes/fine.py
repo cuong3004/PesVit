@@ -67,6 +67,9 @@ class PesDataModule(pl.LightningDataModule):
             self.data_val = ImageFolder("/content/dataset/valid", transform=self.transform_valid)
             # self.data_val = ImageFolder("/content/dataset/test", transform=self.transform_test)
 
+        # self.train_dataloader
+        
+        
     def train_dataloader(self):
         return DataLoader(self.data_train, batch_size=self.batch_size, shuffle=True)
 
@@ -76,7 +79,7 @@ class PesDataModule(pl.LightningDataModule):
     def test_dataloader(self):
         return DataLoader(self.data_val, batch_size=self.batch_size)
 
-from torchmetrics.functional import accuracy, precision, recall
+from torchmetrics.functional import accuracy, precision, recall, f1_score
 average = 'macro'
 
 class LitModel(pl.LightningModule):
@@ -109,12 +112,12 @@ class LitModel(pl.LightningModule):
         
         # preds = torch.argmax(logits, dim=1)
         acc = self.acc(logits, y, num_classes=2)
-        pre = self.pre(logits, y, average=average, num_classes=2)
-        rec = self.rec(logits, y, average=average, num_classes=2)
+        # pre = self.pre(logits, y, average=average, num_classes=2)
+        # rec = self.rec(logits, y, average=average, num_classes=2)
         self.log('train_loss', loss, on_step=False, on_epoch=True, logger=True)
         self.log('train_acc', acc, on_step=False, on_epoch=True, logger=True)
-        self.log('train_pre', pre, on_step=False, on_epoch=True, logger=True)
-        self.log('train_rec', rec, on_step=False, on_epoch=True, logger=True)
+        # self.log('train_pre', pre, on_step=False, on_epoch=True, logger=True)
+        # self.log('train_rec', rec, on_step=False, on_epoch=True, logger=True)
         
         return loss
     
@@ -126,29 +129,62 @@ class LitModel(pl.LightningModule):
         # validation metrics
         # preds = torch.argmax(logits, dim=1)
         acc = self.acc(logits, y, num_classes=2)
-        pre = self.pre(logits, y, average=average, num_classes=2)
-        rec = self.rec(logits, y, average=average, num_classes=2)
+        # pre = self.pre(logits, y, average=average, num_classes=2)
+        # rec = self.rec(logits, y, average=average, num_classes=2)
         self.log('val_loss', loss, on_step=False, on_epoch=True)
-        self.log('val_acc', acc, on_step=False, on_epoch=True)
-        self.log('val_pre', pre, on_step=False, on_epoch=True)
-        self.log('val_rec', rec, on_step=False, on_epoch=True)
+        # self.log('val_acc', acc, on_step=False, on_epoch=True)
+        # self.log('val_pre', pre, on_step=False, on_epoch=True)
+        # self.log('val_rec', rec, on_step=False, on_epoch=True)
         return loss
     
-    def test_step(self, batch, batch_idx):
-        x, y = batch
-        logits = self.model(x)
-        loss = F.cross_entropy(logits, y)
+    def on_train_epoch_end(self):
+        
+        self.eval()
+        self.model.to(self.device)
+        
+        all_preds = []
+        all_labels = []
+        
+        for batch in self.val_dataloader():
+            with torch.no_grad():
+                x, y= batch
+                x = x.to(self.device)
+                # y = y.to(self.device)
+                logits = self.model(x)
 
-        # validation metrics
-        # preds = torch.argmax(logits, dim=1)
-        acc = self.accuracy(preds, y)
-        pre = self.pre(preds, y)
-        rec = self.rec(preds, y)
-        self.log('test_loss', loss, on_step=False, on_epoch=True)
-        self.log('test_acc', acc, on_step=False, on_epoch=True)
-        self.log('test_pre', pre, on_step=False, on_epoch=True)
-        self.log('test_rec', rec, on_step=False, on_epoch=True)
-        return loss
+            pred = logits.to("cpu").argmax(dim=1)
+            all_preds.append(pred)
+            all_labels.append(y)
+            
+        all_preds = torch.cat(all_preds,dim=0)
+        all_labels = torch.cat(all_labels,dim=0)
+        
+        print("-----Start------")
+        print("acc", accuracy(all_preds, all_labels))
+        print("f1", f1_score(all_preds, all_labels, average=average, num_classes=2))
+        print("pre", precision(all_preds, all_labels, average=average, num_classes=2)))
+        print("recall", recall(all_preds, all_labels, average=average, num_classes=2)))
+        print("-----End------")
+        
+        # print("accuracy")
+        
+        # for i 
+        
+    # def test_step(self, batch, batch_idx):
+    #     x, y = batch
+    #     logits = self.model(x)
+    #     loss = F.cross_entropy(logits, y)
+
+    #     # validation metrics
+    #     # preds = torch.argmax(logits, dim=1)
+    #     acc = self.accuracy(preds, y)
+    #     pre = self.pre(preds, y)
+    #     rec = self.rec(preds, y)
+    #     self.log('test_loss', loss, on_step=False, on_epoch=True)
+    #     self.log('test_acc', acc, on_step=False, on_epoch=True)
+    #     self.log('test_pre', pre, on_step=False, on_epoch=True)
+    #     self.log('test_rec', rec, on_step=False, on_epoch=True)
+    #     return loss
     
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=1e-4)
@@ -164,7 +200,7 @@ checkpoint_callback = pl.callbacks.ModelCheckpoint(monitor="val_acc", mode='max'
 
 from pytorch_lightning.loggers import WandbLogger
 
-wandb_logger = WandbLogger(project="MocoSau_fine_tune_6", name="ghost_2", log_model="all")
+wandb_logger = WandbLogger(project="MocoSau_fine_tune_7", name="ghost_2", log_model="all")
 
 
 # Initialize a trainer
