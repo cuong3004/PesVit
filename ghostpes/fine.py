@@ -73,8 +73,8 @@ class PesDataModule(pl.LightningDataModule):
     def val_dataloader(self):
         return DataLoader(self.data_val, batch_size=self.batch_size)
 
-    # def test_dataloader(self):
-    #     return DataLoader(self.data_val, batch_size=self.batch_size)
+    def test_dataloader(self):
+        return DataLoader(self.data_val, batch_size=self.batch_size)
 
 from torchmetrics.functional import accuracy, precision, recall
 average = 'macro'
@@ -181,3 +181,10 @@ trainer = pl.Trainer(max_epochs=50,
 
 # Train the model ⚡🚅⚡
 trainer.fit(model_lit, dm)
+trainer.test(model_lit, dm)
+
+
+model_lit.eval()
+
+all_preds = []
+for batch in tqdm(test_loader):
