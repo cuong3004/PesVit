@@ -223,7 +223,7 @@ trainer.fit(model_lit, dm)
 trainer.test(model_lit, dm)
 
 
-model_lit.eval()
+# model_lit.eval()
 
-all_preds = []
-for batch in tqdm(test_loader):
+# all_preds = []
+# for batch in tqdm(test_loader):
