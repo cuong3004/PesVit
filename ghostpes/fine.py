@@ -10,7 +10,7 @@ from torchvision.datasets import ImageFolder
 from torchmetrics import Accuracy, Precision, Recall
 
 from torchvision import transforms
-from model import get_ghost_vit_1, get_ghost_vit_2, get_ghost_vit_3
+from model import *
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
 import numpy as np
