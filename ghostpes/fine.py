@@ -23,9 +23,7 @@ torch.manual_seed(43)
 
 transform_train = A.Compose([
     A.Blur(),
-    A.Cutout(),
-    A.ISONoise(),
-    A.RandomBrightnessContrast(),
+    A.RandomContrast(),
     A.ColorJitter(),
     A.HorizontalFlip(),
     A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
@@ -200,7 +198,7 @@ class LitModel(pl.LightningModule):
         return optimizer
 
 
-dm = PesDataModule(batch_size=50)
+dm = PesDataModule(batch_size=32)
 
 model_lit = LitModel()
 
