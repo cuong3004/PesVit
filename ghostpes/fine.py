@@ -226,4 +226,4 @@ trainer = pl.Trainer(max_epochs=100,
 
 # Train the model ⚡🚅⚡
 trainer.fit(model_lit, dm)
-trainer.test(model_lit, dm, ckpt_path='best')
+# trainer.test(model_lit, dm, ckpt_path='best')

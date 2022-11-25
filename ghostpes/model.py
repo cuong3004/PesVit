@@ -20,6 +20,7 @@ def get_ghost_vit_1():
     model_ghost_git_1 = MobileViT(opts)
 
     model_ghost_git_1.layer_1 = model_ghost.blocks[0]
+    return model_ghost_git_1
 
 ## ghost 2
 # model_ghost = ghostnet()
@@ -28,6 +29,7 @@ def get_ghost_vit_2():
 
     model_ghost_git_2.layer_1 = model_ghost.blocks[0]
     model_ghost_git_2.layer_2[0] = model_ghost.blocks[1]
+    return model_ghost_git_2
 
 ## ghost 3
 # model_ghost = ghostnet()
@@ -39,6 +41,7 @@ def get_ghost_vit_3():
     model_ghost_git_3.layer_2[0] = model_ghost.blocks[1]
     model_ghost_git_3.layer_2[1] = model_ghost.blocks[2]
     model_ghost_git_3.layer_2[2] = model_ghost.blocks[3]
+    return model_ghost_git_3
 
 
 # model_ghost_git.layer_1 = nn.Sequential(
