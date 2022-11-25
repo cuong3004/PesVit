@@ -131,6 +131,8 @@ class LitModel(pl.LightningModule):
         
         self.all_preds.append(pred.to('cpu'))
         self.all_labels.append(y.to('cpu'))
+
+        # print(len(self.all_preds))
             
         
         
@@ -147,17 +149,26 @@ class LitModel(pl.LightningModule):
         # # self.log('val_rec', rec, on_step=False, on_epoch=True)
         # return loss
     
-    def on_train_start(self):
-        self.log('val_acc', 0)
-        self.log('val_pre', 0)
-        self.log('val_rec', 0)
-        self.log('val_f1', 0)
+    # def on_train_start(self):
+    #     self.log('val_acc', 0)
+    #     self.log('val_pre', 0)
+    #     self.log('val_rec', 0)
+    #     self.log('val_f1', 0)
     
-    def on_valid_end(self):
+    # def on_train_epoch_end(self):
+    #     self.all_preds = []
+    #     self.all_labels = []
+
+    def on_validation_epoch_end(self):
+
         
+        # print( len(self.all_preds))
+        # print( len(self.all_labels))
+        # print([i.shape for i in self.all_preds])
+        # print([i.shape for i in self.all_labels])
         all_preds = torch.cat(self.all_preds,dim=0)
         all_labels = torch.cat(self.all_labels,dim=0)
-        
+        # print(all_preds.shape)
         acc = accuracy(all_preds, all_labels)
         pre = precision(all_preds, all_labels, average=average, num_classes=2)
         rec = recall(all_preds, all_labels, average=average, num_classes=2)
@@ -169,7 +180,7 @@ class LitModel(pl.LightningModule):
         self.log('val_f1', f1)
         
         self.all_preds = []
-        self.all_preds = []
+        self.all_labels = []
     
     # def on_train_epoch_end(self):
         
@@ -220,7 +231,7 @@ class LitModel(pl.LightningModule):
         self.all_preds.append(pred.to('cpu'))
         self.all_labels.append(y.to('cpu'))
     
-    def on_test_end(self):
+    def on_test_epoch_end(self):
         
         all_preds = torch.cat(self.all_preds,dim=0)
         all_labels = torch.cat(self.all_labels,dim=0)
@@ -236,7 +247,7 @@ class LitModel(pl.LightningModule):
         self.log('test_f1', f1)
         
         self.all_preds = []
-        self.all_preds = []
+        self.all_labels = []
         # x, y = batch
         # logits = self.model(x)
         # loss = F.cross_entropy(logits, y)
@@ -266,7 +277,7 @@ checkpoint_callback = pl.callbacks.ModelCheckpoint(monitor="val_acc", mode='max'
 
 from pytorch_lightning.loggers import WandbLogger
 
-wandb_logger = WandbLogger(project="MocoSau_fine_tune_8", name="ghost_vit_new_1", log_model="all")
+wandb_logger = WandbLogger(project="MocoSau_fine_tune_12", name="ghost_vit_new_1", log_model="all")
 
 
 # Initialize a trainer
