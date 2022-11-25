@@ -15,7 +15,7 @@ opts = argparse.Namespace()
 setattr(opts,"model.classification.name","mobilevit")
 setattr(opts,"model.classification.classifier_dropout", 0.1)
 
-setattr(opts,"model.classification.mit.mode" ,"small")
+setattr(opts,"model.classification.mit.mode" ,"x_small")
 setattr(opts,"model.classification.mit.ffn_dropout", 0.0)
 setattr(opts,"model.classification.mit.attn_dropout", 0.0)
 setattr(opts,"model.classification.mit.dropout", 0.05)

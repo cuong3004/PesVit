@@ -64,7 +64,16 @@ def get_ghost_vit_3():
 # #     ))
 
 # print(model_ghost_git(torch.ones((2,3,224,224))).shape)
+module_model = get_ghost_vit_1
+# print(module_model())
+print(module_model()(torch.ones((2,3,224,224))).shape)
 
+module_model = get_ghost_vit_2
+# print(module_model())
+print(module_model()(torch.ones((2,3,224,224))).shape)
 
+module_model = get_ghost_vit_3
+# print(module_model())
+print(module_model()(torch.ones((2,3,224,224))).shape)
 
 

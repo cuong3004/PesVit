@@ -97,7 +97,7 @@ class LitModel(pl.LightningModule):
 
         # model = torchvision.models.mobilenet_v2(pretrained=True)
 
-        model.classifier.fc = nn.Linear(640, 2)
+        model.classifier.fc = nn.Linear(384, 2)
 
         self.model = model
 
