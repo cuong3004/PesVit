@@ -14,9 +14,10 @@ class Identity(nn.Module):
 ## ghost 1
 model_ghost = ghostnet()
 
-def get_ghost_vit_1():
-    
+def get_mobile_vit():
+    return MobileViT(opts)
 
+def get_ghost_vit_1():
     model_ghost_git_1 = MobileViT(opts)
 
     model_ghost_git_1.layer_1 = model_ghost.blocks[0]
