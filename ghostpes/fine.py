@@ -10,7 +10,7 @@ from torchvision.datasets import ImageFolder
 from torchmetrics import Accuracy, Precision, Recall
 
 from torchvision import transforms
-from model import model_ghost_git
+from model import get_ghost_vit_1, get_ghost_vit_2, get_ghost_vit_3
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
 import numpy as np
@@ -93,11 +93,11 @@ class LitModel(pl.LightningModule):
 
         # model = MobileViT(opts)
         # model.load_state_dict(torch.load("mobilevit_xxs.pt"))
-        model = model_ghost_git
+        model = get_ghost_vit_1()
 
         # model = torchvision.models.mobilenet_v2(pretrained=True)
 
-        model.classifier.fc = nn.Linear(320, 2)
+        model.classifier.fc = nn.Linear(640, 2)
 
         self.model = model
 
@@ -209,11 +209,11 @@ checkpoint_callback = pl.callbacks.ModelCheckpoint(monitor="val_acc", mode='max'
 
 from pytorch_lightning.loggers import WandbLogger
 
-wandb_logger = WandbLogger(project="MocoSau_fine_tune_8", name="ghost_2", log_model="all")
+wandb_logger = WandbLogger(project="MocoSau_fine_tune_8", name="ghost_vit_new_1", log_model="all")
 
 
 # Initialize a trainer
-trainer = pl.Trainer(max_epochs=50,
+trainer = pl.Trainer(max_epochs=100,
                      gpus=1, 
                     #  step-
                     # limit_train_batches=0.3,
@@ -226,4 +226,4 @@ trainer = pl.Trainer(max_epochs=50,
 
 # Train the model ⚡🚅⚡
 trainer.fit(model_lit, dm)
-trainer.test(model_lit, dm)
+trainer.test(model_lit, dm, ckpt_path='best')
