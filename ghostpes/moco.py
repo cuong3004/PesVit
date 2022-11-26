@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from lightly.models.modules.heads import MoCoProjectionHead
-from model import model_ghost_git
+from model import get_ghost_vit_2
 from lightly.models.modules.heads import MoCoProjectionHead
 from lightly.models.utils import deactivate_requires_grad
 from lightly.models.utils import update_momentum
@@ -43,16 +43,22 @@ class MyNCELoss(lightly.loss.NTXentLoss):
     def forward(self, out0: torch.Tensor, out1: torch.Tensor):
         return super().forward(out0, out1)
 
+class Idenity(nn.Module):
+    def __init__(self):
+        super().__init__()
+    def forward(self, x):
+        return x
+    
 class MocoModel(pl.LightningModule):
     def __init__(self, temp=0.1, learning_rate=0.0005, momentum=0.99):
         super().__init__()
 
         self.save_hyperparameters()
 
-        model = model_ghost_git
+        model = get_ghost_vit_2()
         # model.load_state_dict(torch.load("mobilevit_xxs.pt"))
         # model = mobilevit_xs()
-        model.classifier.fc = nn.Linear(320, 512)
+        model.classifier.fc = Idenity()
         self.backbone = model
         self.crossEntropy = nn.CrossEntropyLoss(reduction="mean")
         # self.backbone = nn.Sequential(
@@ -61,7 +67,7 @@ class MocoModel(pl.LightningModule):
         # )
         # mobilevit_s
 
-        self.projection_head = MoCoProjectionHead(512, 512, 128)
+        self.projection_head = MoCoProjectionHead(384, 384, 128)
 
         
         
