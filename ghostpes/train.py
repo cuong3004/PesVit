@@ -49,7 +49,7 @@ if args.path_resume:
     #  gpus=gpus,
                         accelerator='gpu', devices=1,
                         #  default_root_dir="/content/drive/MyDrive/log_moco_sau",
-                         resume_from_checkpoint=path_checkpoint,
+                        resume_from_checkpoint=path_checkpoint,
                         #  limit_train_batches=20,
                         logger=wandb_logger,
                         callbacks=[checkpoint_callback, lr_monitor],
@@ -70,7 +70,7 @@ else:
     # wandb.finish()
 
 
-    wandb_logger = WandbLogger(project="MocoSau", name=args.name, log_model="all")
+    wandb_logger = WandbLogger(project="MocoSau_ver2", name=args.name, log_model="all")
     checkpoint_callback = ModelCheckpoint(monitor="train_loss_ssl", mode="min")
     model = MocoModel(args.temp, args.learning_rate, args.momentum)
     # path_checkpoint = "/content/epoch=38-step=34164.ckpt"
