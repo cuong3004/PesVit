@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from lightly.models.modules.heads import MoCoProjectionHead
-from ghostpes.model import get_ghost_vit_2
+from model import model_ghost_git
 from lightly.models.modules.heads import MoCoProjectionHead
 from lightly.models.utils import deactivate_requires_grad
 from lightly.models.utils import update_momentum
@@ -49,10 +49,10 @@ class MocoModel(pl.LightningModule):
 
         self.save_hyperparameters()
 
-        model = get_ghost_vit_2()
+        model = model_ghost_git
         # model.load_state_dict(torch.load("mobilevit_xxs.pt"))
         # model = mobilevit_xs()
-        model.classifier.fc = nn.Linear(384, 512)
+        model.classifier.fc = nn.Linear(320, 512)
         self.backbone = model
         self.crossEntropy = nn.CrossEntropyLoss(reduction="mean")
         # self.backbone = nn.Sequential(
