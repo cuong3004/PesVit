@@ -40,7 +40,7 @@ if args.path_resume:
     wandb.finish()
 
 
-    wandb_logger = WandbLogger(project="MocoSau", name=args.name, log_model="all")
+    wandb_logger = WandbLogger(project="MocoSau_ver2", name=args.name, log_model="all")
     checkpoint_callback = ModelCheckpoint(monitor="train_loss_ssl", mode="min")
     # model = MocoModel()
     # path_checkpoint = "/content/epoch=38-step=34164.ckpt"
