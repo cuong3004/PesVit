@@ -241,7 +241,7 @@ class LitModel(pl.LightningModule):
         rec = recall(all_preds, all_labels, average=average, num_classes=2)
         f1 = f1_score(all_preds, all_labels, average=average, num_classes=2)
         
-        self.log('test_acc', acc[1])
+        self.log('test_acc', acc)
         self.log('test_pre', pre[1])
         self.log('test_rec', rec[1])
         self.log('test_f1', f1[1])
@@ -295,7 +295,8 @@ trainer = pl.Trainer(max_epochs=100,
 # Train the model ⚡🚅⚡
 trainer.fit(model_lit, dm)
 
-model_lit.load_from_checkpoint(trainer.checkpoint_callback.best_model_path)
+model_lit = LitModel.load_from_checkpoint(trainer.checkpoint_callback.best_model_path)
+# model_lit.load_from_checkpoint(trainer.checkpoint_callback.best_model_path)
 trainer.test(model_lit, dm)
 # print(trainer.checkpoint_callback.best_model_path)
 
