@@ -78,7 +78,7 @@ class PesDataModule(pl.LightningDataModule):
         return DataLoader(self.data_test, batch_size=self.batch_size)
 
 from torchmetrics.functional import accuracy, precision, recall, f1_score
-average = 'macro'
+average = None
 
 class LitModel(pl.LightningModule):
     def __init__(self):
@@ -175,9 +175,9 @@ class LitModel(pl.LightningModule):
         f1 = f1_score(all_preds, all_labels, average=average, num_classes=2)
         
         self.log('val_acc', acc)
-        self.log('val_pre', pre)
-        self.log('val_rec', rec)
-        self.log('val_f1', f1)
+        self.log('val_pre', pre[1])
+        self.log('val_rec', rec[1])
+        self.log('val_f1', f1[1])
         
         self.all_preds = []
         self.all_labels = []
@@ -241,10 +241,10 @@ class LitModel(pl.LightningModule):
         rec = recall(all_preds, all_labels, average=average, num_classes=2)
         f1 = f1_score(all_preds, all_labels, average=average, num_classes=2)
         
-        self.log('test_acc', acc)
-        self.log('test_pre', pre)
-        self.log('test_rec', rec)
-        self.log('test_f1', f1)
+        self.log('test_acc', acc[1])
+        self.log('test_pre', pre[1])
+        self.log('test_rec', rec[1])
+        self.log('test_f1', f1[1])
         
         self.all_preds = []
         self.all_labels = []
