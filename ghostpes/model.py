@@ -14,19 +14,22 @@ class Identity(nn.Module):
 ## ghost 1
 model_ghost = ghostnet()
 
-def get_mobile_vit():
-    return MobileViT(opts)
+def get_mobile_vit(pretrained = False):
+    model =  MobileViT(opts)
+    if pretrained:
+        model.load_state_dict(torch.load("mobilevit_xs.pt"))
+    return model
 
-def get_ghost_vit_1():
-    model_ghost_git_1 = MobileViT(opts)
+def get_ghost_vit_1(pretrained = False):
+    model_ghost_git_1 = get_mobile_vit(pretrained)
 
     model_ghost_git_1.layer_1 = model_ghost.blocks[0]
     return model_ghost_git_1
 
 ## ghost 2
 # model_ghost = ghostnet()
-def get_ghost_vit_2():
-    model_ghost_git_2 = MobileViT(opts)
+def get_ghost_vit_2(pretrained = False):
+    model_ghost_git_2 = get_mobile_vit(pretrained)
 
     model_ghost_git_2.layer_1 = model_ghost.blocks[0]
     model_ghost_git_2.layer_2[0] = model_ghost.blocks[1]
@@ -35,8 +38,8 @@ def get_ghost_vit_2():
 ## ghost 3
 # model_ghost = ghostnet()
 
-def get_ghost_vit_3():
-    model_ghost_git_3 = MobileViT(opts)
+def get_ghost_vit_3(pretrained = False):
+    model_ghost_git_3 = get_mobile_vit(pretrained)
 
     model_ghost_git_3.layer_1 = model_ghost.blocks[0]
     model_ghost_git_3.layer_2[0] = model_ghost.blocks[1]
