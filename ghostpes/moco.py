@@ -55,7 +55,7 @@ class MocoModel(pl.LightningModule):
 
         self.save_hyperparameters()
 
-        model = get_ghost_vit_2()
+        model = get_ghost_vit_2(pretrained=True)
         # model.load_state_dict(torch.load("mobilevit_xxs.pt"))
         # model = mobilevit_xs()
         model.classifier.fc = Idenity()
