@@ -48,7 +48,7 @@ if args.path_resume:
     trainer = pl.Trainer(max_epochs=max_epochs,
     #  gpus=gpus,
                         accelerator='gpu', devices=1,
-                        #  default_root_dir="/content/drive/MyDrive/log_moco_sau",
+
                         resume_from_checkpoint=path_checkpoint,
                         #  limit_train_batches=20,
                         logger=wandb_logger,
@@ -57,17 +57,6 @@ if args.path_resume:
     )
 
 else:
-    # import wandb
-
-    # checkpoint_reference = args.path_resume
-
-    # # download checkpoint locally (if not already cached)
-    # run = wandb.init()
-    # artifact = run.use_artifact(checkpoint_reference, type="model")
-    # artifact_dir = artifact.download()
-
-    # path_checkpoint = artifact_dir + '/model.ckpt'
-    # wandb.finish()
 
 
     wandb_logger = WandbLogger(project="MocoSau_ver2", name=args.name, log_model="all")
@@ -78,9 +67,7 @@ else:
     trainer = pl.Trainer(max_epochs=max_epochs,
                         #  gpus=gpus,
                         accelerator='gpu', devices=1,
-                        #  default_root_dir="/content/drive/MyDrive/log_moco_sau",
-                        #  resume_from_checkpoint=path_checkpoint,
-                        #  limit_train_batches=20,
+
                         logger=wandb_logger,
                         callbacks=[checkpoint_callback, lr_monitor],
     # , precision=16

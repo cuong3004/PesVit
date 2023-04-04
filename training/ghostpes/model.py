@@ -48,36 +48,10 @@ def get_ghost_vit_3(pretrained = False):
     return model_ghost_git_3
 
 
-# model_ghost_git.layer_1 = nn.Sequential(
-#         *list(model_ghost.blocks.children())[:-5],
-#     )
-# # model_ghost_git.layer_2 = nn.Conv2d(40, 48, 1)
-# model_ghost_git.layer_2 = Identity()
-# model_ghost_git.layer_3[0] = Identity()
-# model_ghost_git.layer_4[0] = module_ghost_1
-# model_ghost_git.layer_5[0] = module_ghost_2
+model_vit = get_mobile_vit()
 
-# def count_parameters(model):
-#     return sum(p.numel() for p in model.parameters() if p.requires_grad)
+layer_3_vit = model_vit.layer_3[1]
 
-# # print(count_parameters(model_ghost_git))
-# # print(model_ghost_git)
-
-# # print(nn.Sequential(
-# #         *list(model_ghost.blocks.children())[:-5],
-# #     ))
-
-# print(model_ghost_git(torch.ones((2,3,224,224))).shape)
-module_model = get_ghost_vit_1
-# print(module_model())
-print(module_model()(torch.ones((2,3,224,224))).shape)
-
-module_model = get_ghost_vit_2
-# print(module_model())
-print(module_model()(torch.ones((2,3,224,224))).shape)
-
-module_model = get_ghost_vit_3
-# print(module_model())
-print(module_model()(torch.ones((2,3,224,224))).shape)
+print([i for i in layer_3_vit.state_dict()])
 
 
