@@ -1,3 +1,4 @@
+README.md
 setup.py
 common/__init__.py
 cvnets/__init__.py
