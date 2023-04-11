@@ -20,3 +20,10 @@ To use the app, simply run the app.py file:
 ```
 python app.py
 ```
+
+### use video
+To use for video. You need Enter the start date, end date, and video name in the corresponding fields.
+
+Note: Make sure that you have entered the correct format for the start and end dates in the "dd/mm/yy" format.
+
+![](images/8eeae368fea222fc7bb3.jpg)
